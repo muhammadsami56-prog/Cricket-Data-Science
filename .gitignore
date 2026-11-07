@@ -1,0 +1,26 @@
+
+# Python environment
+venv/
+__pycache__/
+*.py[cod]
+
+# Environment variables
+.env
+
+# Local database
+cricket.db
+*.db
+
+# Original dataset
+international-t20-cricket-dataset-2005-2025-main/
+*.zip
+
+# Dataset backup
+data/matches_backup.csv
+
+# Temporary files
+.DS_Store
+.vscode/
+
+# Raw YAML dataset files
+data/*.yaml
