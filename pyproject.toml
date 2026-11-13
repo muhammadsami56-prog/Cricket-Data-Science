@@ -1,2 +1,19 @@
+[project]
+name = "cricket-data-science"
+version = "1.0.0"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi==0.162.0",
+    "pandas==3.1.0",
+    "uvicorn",
+    "sqlalchemy",
+    "psycopg[binary]",
+    "python-dotenv",
+    "joblib",
+    "scikit-learn",
+    "jinja2",
+    "python-multipart"
+]
+
 [tool.vercel]
 entrypoint = "backend.main:app"
