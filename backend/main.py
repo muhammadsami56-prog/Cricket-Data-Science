@@ -1,4 +1,3 @@
-
 from datetime import datetime
 import pandas as pd
 import joblib
@@ -19,12 +18,34 @@ templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Database configuration
-DATABASE_URL = "sqlite:///./cricket.db"
 
-engine = create_engine(
-    DATABASE_URL,
-    connect_args={"check_same_thread": False}
-)
+import os
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Project root directory
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load Neon environment variables locally
+load_dotenv(BASE_DIR / ".env.neon")
+
+# Database configuration
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if DATABASE_URL:
+    DATABASE_URL = DATABASE_URL.replace(
+        "postgresql://", "postgresql+psycopg://", 1
+    )
+    engine = create_engine(
+        DATABASE_URL,
+        pool_pre_ping=True
+    )
+else:
+    DATABASE_URL = f"sqlite:///{BASE_DIR / 'cricket.db'}"
+    engine = create_engine(
+        DATABASE_URL,
+        connect_args={"check_same_thread": False}
+    )
 
 SessionLocal = sessionmaker(
     autocommit=False,
@@ -74,9 +95,21 @@ def home(request: Request):
 )
 
 
-# Get options for dropdowns
 
 # Get options for dropdowns
+@app.get("/api/db-check")
+def db_check():
+    db = SessionLocal()
+    try:
+        return {
+            "database": engine.url.database,
+            "host": engine.url.host,
+            "total_matches": db.query(Match).count()
+        }
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        db.close()
 @app.get("/api/options")
 def get_options():
     db = SessionLocal()
@@ -134,7 +167,7 @@ def get_matches():
 # Prediction request format
 
 
-        # Prediction request format
+       
 class PredictionInput(BaseModel):
     team1: str
     team2: str
